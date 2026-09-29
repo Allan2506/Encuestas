@@ -1,0 +1,72 @@
+name: Bot Encuestas McDonald's
+
+# Esto crea el menú interactivo en tu celular
+on:
+  workflow_dispatch:
+    inputs:
+      opcion_tiempo:
+        description: '¿Usar fecha/hora actual o manual?'
+        required: true
+        default: 'actual'
+        type: choice
+        options:
+          - actual
+          - manual
+      dia:
+        description: 'Día (ej. 14) - Solo si elegiste manual'
+        required: false
+        default: ''
+      hora:
+        description: 'Hora 24h (ej. 08) - Solo si elegiste manual'
+        required: false
+        default: ''
+      minuto:
+        description: 'Minutos (ej. 30) - Solo si elegiste manual'
+        required: false
+        default: ''
+      tipo_usuario:
+        description: 'Tipo de comentario a dejar'
+        required: true
+        default: 'B'
+        type: choice
+        options:
+          - B
+          - I
+
+jobs:
+  ejecutar-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Instalar navegadores Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Descargar lista de proxies (ProxyScrape)
+        run: curl -s "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=5000&country=all&ssl=all&anonymity=all" > proxies.txt
+
+      - name: Ejecutar script de Playwright
+        env:
+          TIEMPO_OPCION: ${{ inputs.opcion_tiempo }}
+          DIA_MANUAL: ${{ inputs.dia }}
+          HORA_MANUAL: ${{ inputs.hora }}
+          MINUTO_MANUAL: ${{ inputs.minuto }}
+          TIPO_USUARIO: ${{ inputs.tipo_usuario }}
+        run: npm run test
+
+      - name: Guardar capturas de pantalla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprobantes-encuestas
+          path: '*.png'
+          retention-days: 3
