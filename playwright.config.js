@@ -10,7 +10,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    headless: false, // Mostrar navegador
+    headless: true, // Mostrar navegador
     viewport: { width: 1280, height: 720 }, // Opcional, tamaño de ventana
     trace: 'on-first-retry',
   },

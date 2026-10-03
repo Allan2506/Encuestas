@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-
+test.use({ headless: true });
 const NUMERO_DE_INTENTOS = 6;
 
 for (let i = 1; i <= NUMERO_DE_INTENTOS; i++) {
