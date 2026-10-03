@@ -61,6 +61,7 @@ jobs:
           HORA_MANUAL: ${{ inputs.hora }}
           MINUTO_MANUAL: ${{ inputs.minuto }}
           TIPO_USUARIO: ${{ inputs.tipo_usuario }}
+          TZ: 'America/Mexico_City'
         run: npm run test
 
       - name: Guardar capturas de pantalla
