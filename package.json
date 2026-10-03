@@ -1,7 +1,6 @@
 {
   "name": "mcd-bot",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "test": "playwright test tests/mcd_encuesta.spec.js --workers=1"
   },

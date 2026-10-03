@@ -36,7 +36,7 @@ for (let i = 1; i <= NUMERO_DE_INTENTOS; i++) {
       await page.waitForTimeout(1000);
       await expect(page.locator('#InputAcronym')).toHaveValue('0133');
 
-      console.log(`[Intento ${i}] Paso: Configurando FECHA y HORA`);
+     console.log(`[Intento ${i}] Paso: Configurando FECHA y HORA`);
       await page.click('.ui-datepicker-trigger');
       await page.waitForSelector('.ui-datepicker');
       await page.waitForTimeout(1500);
@@ -56,7 +56,23 @@ for (let i = 1; i <= NUMERO_DE_INTENTOS; i++) {
         console.log(`[Intento ${i}] Usando fecha ACTUAL: Día ${dia} a las ${hora}:${minuto}`);
       }
 
-      await page.locator('.ui-datepicker-calendar td a').getByText(dia, { exact: true }).first().click();
+      // --- INICIO DE VALIDACIÓN DE MES ---
+      // Localizamos el día en el calendario activo
+      const diaLocator = page.locator('.ui-datepicker-calendar td a').getByText(dia, { exact: true }).first();
+
+      // Si Playwright detecta que el día no existe o no está visible en la pantalla actual
+      if (!(await diaLocator.isVisible())) {
+          console.log(`[Intento ${i}] Día ${dia} no visible en el mes actual. Retrocediendo un mes...`);
+          await page.click('span.ui-icon-circle-triangle-w');
+          
+          // Esperamos a que termine la animación de transición del calendario
+          await page.waitForTimeout(1000);
+      }
+
+      // Hacemos clic en el día ya garantizando que está en pantalla
+      await diaLocator.click();
+      // --- FIN DE VALIDACIÓN DE MES ---
+
       await page.waitForTimeout(1000);
       await expect(page.locator('#Index_VisitDateDatePicker')).toHaveValue(/\d{2}\/\d{2}\/\d{2}/);
       
